@@ -22,6 +22,11 @@ struct command {
 	struct command *pipeCommand;
 };
 
+struct pathNode {
+	char *pathText;
+	struct pathNode *next;
+} *path;
+
 void printError(char *msg)
 {
 	if (strcmp(msg, "") == 0)
@@ -93,6 +98,49 @@ int getWord(char **buffer)
 	return SPACE;
 }
 
+void addPathToCommand(struct command *command)
+{
+	if ( *(command->command) == '/') {
+		command->path = strdup(command->command);
+		return;
+	}
+
+	struct pathNode *node;
+	char *route;
+	int found = 0, acc;
+
+	for (node = path; node; node = node->next) {
+		route = malloc(sizeof(char) * (strlen(command->command) + strlen(node->pathText) + 2));
+
+		if (route == NULL) {
+			printError("");
+			break;
+		}
+
+		strcpy(route, node->pathText);
+		strcat(route, "/");
+		strcat(route, command->command);
+
+		acc = access(route, X_OK);
+
+		if (acc == 0) {
+			command->path = strdup(route);
+			found = 1;
+			break;
+		}
+
+		free(route);
+	}
+
+
+	if (found == 0) 
+		command-> path = strdup(command->command);
+
+	if (command->path == NULL)
+		printError("error: Problem in the strdup command to add the path\n");
+	
+}
+
 
 int getCommand(struct command **commandPtr)
 {
@@ -119,6 +167,8 @@ int getCommand(struct command **commandPtr)
 	command->command = word;
 	command->numArgs = 0;
 	command->pipeCommand = NULL;
+	command->path = NULL;
+	addPathToCommand(command);
 
 	command->args[command->numArgs++] = word;
 
@@ -161,22 +211,73 @@ int getCommand(struct command **commandPtr)
 
 	command->args[command->numArgs] = NULL;
 
+
 	return 0;
 }
 
 void printPath()
 {
-	printf("Print path\n");
+	struct pathNode *node;
+
+	for (node = path; node; node = node->next)
+		printf("%s%s", node->pathText, node->next != NULL ? ":" : "");
+
+	printf("\n");
 }
 
-void addPath(char *path)
+void addPath(char *pathText)
 {
-	printf("Add path \"%s\"\n", path);
+	struct pathNode *node;
+
+	if (path == NULL) {
+		path = malloc(sizeof(struct pathNode));
+		node = path;
+	}else{
+		for (node = path; node->next; node = node->next)
+			;
+
+		node->next = malloc(sizeof(struct pathNode));
+		node = node->next;
+	}
+		
+
+	if (node == NULL) {
+		printError("");
+		return;
+	}
+
+	node->next = NULL;
+	node->pathText = strdup(pathText);
+
+	if (node->pathText == NULL)
+		printError("");
 }
 
-void deletePath(char *path)
+void deletePath(char *pathText)
 {
-	printf("Delete path \"%s\"\n", path);
+	struct pathNode *node, *previous = NULL;
+	int found = 0;
+
+	for (node = path; node; node = node->next){
+		if (strcmp(node->pathText, pathText) == 0){
+			found = 1;
+			break;
+		}
+
+		previous = node;
+	}
+
+	if (found == 1) {
+		if (previous == NULL) {
+			path = node->next;
+		} else {
+			previous->next = node->next;
+		}
+
+		free(node);
+	} else {
+		printf("error: Entry \"%s\" not found in path", pathText);
+	}
 }
 
 void handlePathCommand(struct command *command)
@@ -196,8 +297,9 @@ void handlePathCommand(struct command *command)
 			deletePath(command->args[2]);
 		else
 			printError("Need to secify path to delete");
+	} else {
+		printf("error: Unknown argument \"%s\"\n", command->args[1]);
 	}
-
 }
 
 void execCommand(struct command *command)
@@ -228,7 +330,7 @@ void execCommand(struct command *command)
 	}
 
 	if (pid == 0){
-		execv(command->command, command->args);
+		execv(command->path, command->args);
 		printError("");
 		exit(errno);
 	}else{
@@ -257,6 +359,7 @@ int main(int argc, char **argv)
 
 	printf("$");
 	command = NULL;
+	path = NULL;
 
 	while ((flag = getCommand(&command)) != -1) {
 		if (command == NULL) {
