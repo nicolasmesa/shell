@@ -175,6 +175,9 @@ void execCommand(struct command *command)
 		return;	
 	}
 
+	if (strcmp("exit", command->command) == 0)
+		exit(0);
+
 
 	int pid = fork();
 
