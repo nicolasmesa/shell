@@ -164,6 +164,42 @@ int getCommand(struct command **commandPtr)
 	return 0;
 }
 
+void printPath()
+{
+	printf("Print path\n");
+}
+
+void addPath(char *path)
+{
+	printf("Add path \"%s\"\n", path);
+}
+
+void deletePath(char *path)
+{
+	printf("Delete path \"%s\"\n", path);
+}
+
+void handlePathCommand(struct command *command)
+{
+	if (command->numArgs == 1){
+		printPath();
+		return;
+	}
+
+	if (strcmp("+", command->args[1]) == 0){
+		if (command->numArgs > 2)
+			addPath(command->args[2]);
+		else
+			printError("Need to specify the path to add");
+	} else if (strcmp("-", command->args[1]) == 0) {
+		if (command->numArgs > 2)
+			deletePath(command->args[2]);
+		else
+			printError("Need to secify path to delete");
+	}
+
+}
+
 void execCommand(struct command *command)
 {
 	int status;
@@ -177,6 +213,11 @@ void execCommand(struct command *command)
 
 	if (strcmp("exit", command->command) == 0)
 		exit(0);
+
+	if (strcmp("path", command->command) == 0){
+		handlePathCommand(command);
+		return;
+	}
 
 
 	int pid = fork();
