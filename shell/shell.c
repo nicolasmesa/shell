@@ -10,6 +10,16 @@
 
 #define INITIAL_WORD_SIZE 20
 
+#define MAX_ARGS 20
+
+struct command {
+	char *command;
+	char *args[MAX_ARGS + 1];
+	char *path;
+	int numArgs;
+	struct command *pipeCommand;
+};
+
 void printError(char *msg)
 {
 	if (strcmp(msg, "") == 0)
@@ -81,15 +91,45 @@ int getWord(char **buffer)
 	return SPACE;
 }
 
-int main(int argc, char **argv)
-{
-	char *word = NULL;
-	int flag;
 
+int getCommand(struct command **commandPtr)
+{
+	char *word;
+	int flag;
+	struct command *command = (struct command *)malloc(sizeof(struct command));
+
+	word = NULL;
+
+	if (command == NULL) {
+		printError("");
+		return ERROR;
+	}
+
+	flag = getWord(&word);
+
+	if (flag == ERROR) {
+		return ERROR;
+	}
+
+	if (word == NULL) {
+		return BN;
+	}
+
+	command->command = (char *)word;
+	command->numArgs = 0;
+
+	*commandPtr = command;
+
+	if (flag == BN)
+		return BN;
+	
+	word = NULL;
 	while ((flag = getWord(&word)) != BN || word != NULL) {
+		if (flag == ERROR)
+			continue;
+
 		if (word != NULL) {
-			printf("%s\n", word);
-			free(word);
+			command->args[command->numArgs++] = word;
 			word = NULL;
 		}
 
@@ -99,6 +139,31 @@ int main(int argc, char **argv)
 		if (flag == PIPE)
 			printf("Pipe\n");
 
+		word = NULL;
+	}
+
+	return 0;
+}
+
+int main(int argc, char **argv)
+{
+	struct command *command;
+	int flag;
+
+	printf("$");
+	command = NULL;
+
+	while ((flag = getCommand(&command)) != -1){
+		if (command == NULL) {
+			printf("$");
+			continue;
+		}
+
+		printf("Command: %s\n", command->command);
+		printf("$");
+
+		/*memory leak */
+		command = NULL;
 	}
 
 	return 0;
