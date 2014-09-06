@@ -95,7 +95,7 @@ int getWord(char **buffer)
 int getCommand(struct command **commandPtr)
 {
 	char *word;
-	int flag;
+	int flag, pipeFlag;
 	struct command *command = (struct command *)malloc(sizeof(struct command));
 
 	word = NULL;
@@ -117,6 +117,7 @@ int getCommand(struct command **commandPtr)
 
 	command->command = word;
 	command->numArgs = 0;
+	command->pipeCommand = NULL;
 
 	command->args[command->numArgs++] = word;
 
@@ -124,6 +125,11 @@ int getCommand(struct command **commandPtr)
 
 	if (flag == BN)
 		return BN;
+
+	if (flag == PIPE) {
+		command->args[command->numArgs] = NULL;
+		return getCommand(&(command->pipeCommand));
+	}
 	
 	word = NULL;
 	while ((flag = getWord(&word)) != BN || word != NULL) {
@@ -138,8 +144,14 @@ int getCommand(struct command **commandPtr)
 		if (flag == BN)
 			break;
 
-		if (flag == PIPE)
-			printf("Pipe\n");
+		if (flag == PIPE) {
+			pipeFlag = getCommand(&(command->pipeCommand));	
+
+			if(pipeFlag == ERROR)
+				return ERROR;
+
+			break;
+		}
 
 		word = NULL;
 
@@ -153,7 +165,7 @@ int getCommand(struct command **commandPtr)
 
 int main(int argc, char **argv)
 {
-	struct command *command;
+	struct command *command, *commands;
 	int flag;
 	int i;
 
@@ -166,11 +178,16 @@ int main(int argc, char **argv)
 			continue;
 		}
 
-		printf("Command: %s\n", command->command);
-		printf("Args: \n");
+		for (commands = command; commands; commands = commands->pipeCommand) {
+			printf("Command: %s\n", commands->command);
+			printf("Args: \n");
 
-		for (i = 0; i < command->numArgs; i++)
-			printf("\t-%s\n", command->args[i]);
+			for (i = 0; i < commands->numArgs; i++)
+				printf("\t-%s\n", commands->args[i]);
+
+			if (commands->pipeCommand)
+				printf("--------Pipe------\n");
+		}
 
 		printf("$");
 
