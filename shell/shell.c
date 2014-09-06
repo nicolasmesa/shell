@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/errno.h>
+#include <unistd.h>
+#include <sys/wait.h>
 
 #define ERROR -1
 #define SPACE 0
@@ -25,7 +27,7 @@ void printError(char *msg)
 	if (strcmp(msg, "") == 0)
 		msg = strerror(errno);
 
-	printf("error: %s", msg);
+	printf("error: %s\n", msg);
 }
 
 int getWord(char **buffer)
@@ -96,7 +98,8 @@ int getCommand(struct command **commandPtr)
 {
 	char *word;
 	int flag, pipeFlag;
-	struct command *command = (struct command *)malloc(sizeof(struct command));
+	struct command *command =
+			(struct command *)malloc(sizeof(struct command));
 
 	word = NULL;
 
@@ -107,13 +110,11 @@ int getCommand(struct command **commandPtr)
 
 	flag = getWord(&word);
 
-	if (flag == ERROR) {
+	if (flag == ERROR)
 		return ERROR;
-	}
 
-	if (word == NULL) {
+	if (word == NULL)
 		return BN;
-	}
 
 	command->command = word;
 	command->numArgs = 0;
@@ -145,9 +146,9 @@ int getCommand(struct command **commandPtr)
 			break;
 
 		if (flag == PIPE) {
-			pipeFlag = getCommand(&(command->pipeCommand));	
+			pipeFlag = getCommand(&(command->pipeCommand));
 
-			if(pipeFlag == ERROR)
+			if (pipeFlag == ERROR)
 				return ERROR;
 
 			break;
@@ -163,35 +164,67 @@ int getCommand(struct command **commandPtr)
 	return 0;
 }
 
+void execCommand(struct command *command)
+{
+	int status;
+
+	if (strcmp("cd", command->command) == 0 && command->numArgs > 1) {
+		if (chdir(command->args[1]) == -1)
+			printError("");
+
+		return;	
+	}
+
+
+	int pid = fork();
+
+	if (pid < 0) {
+		printError("");
+		return;
+	}
+
+	if (pid == 0){
+		execv(command->command, command->args);
+		printError("");
+		exit(errno);
+	}else{
+		wait(&status);		
+	}
+		
+	
+}
+
+void freeCommand(struct command *command)
+{
+	int i;
+	if(command->pipeCommand != NULL)
+		freeCommand(command->pipeCommand);
+
+	for (i = 0; i < command->numArgs; i++)
+		free(command->args[i]);
+
+	free(command);
+}
+
 int main(int argc, char **argv)
 {
-	struct command *command, *commands;
+	struct command *command;
 	int flag;
-	int i;
 
 	printf("$");
 	command = NULL;
 
-	while ((flag = getCommand(&command)) != -1){
+	while ((flag = getCommand(&command)) != -1) {
 		if (command == NULL) {
 			printf("$");
 			continue;
 		}
 
-		for (commands = command; commands; commands = commands->pipeCommand) {
-			printf("Command: %s\n", commands->command);
-			printf("Args: \n");
-
-			for (i = 0; i < commands->numArgs; i++)
-				printf("\t-%s\n", commands->args[i]);
-
-			if (commands->pipeCommand)
-				printf("--------Pipe------\n");
-		}
+		execCommand(command);
 
 		printf("$");
 
-		/*memory leak */
+		freeCommand(command);
 		command = NULL;
 	}
 
