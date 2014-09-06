@@ -1,3 +1,4 @@
 shell/w4118_sh
 shell/shell.o
 shell/checkpathch.pl
+shell/checkpatch2
