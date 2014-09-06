@@ -115,8 +115,10 @@ int getCommand(struct command **commandPtr)
 		return BN;
 	}
 
-	command->command = (char *)word;
+	command->command = word;
 	command->numArgs = 0;
+
+	command->args[command->numArgs++] = word;
 
 	*commandPtr = command;
 
@@ -140,7 +142,11 @@ int getCommand(struct command **commandPtr)
 			printf("Pipe\n");
 
 		word = NULL;
+
+		/* Verify max ars */
 	}
+
+	command->args[command->numArgs] = NULL;
 
 	return 0;
 }
@@ -149,6 +155,7 @@ int main(int argc, char **argv)
 {
 	struct command *command;
 	int flag;
+	int i;
 
 	printf("$");
 	command = NULL;
@@ -160,6 +167,11 @@ int main(int argc, char **argv)
 		}
 
 		printf("Command: %s\n", command->command);
+		printf("Args: \n");
+
+		for (i = 0; i < command->numArgs; i++)
+			printf("\t-%s\n", command->args[i]);
+
 		printf("$");
 
 		/*memory leak */
