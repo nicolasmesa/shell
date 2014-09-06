@@ -10,8 +10,9 @@
 
 #define INITIAL_WORD_SIZE 20
 
-void printError(char *msg){
-	if(strcmp(msg, "") == 0)
+void printError(char *msg)
+{
+	if (strcmp(msg, "") == 0)
 		msg = strerror(errno);
 
 	printf("error: %s", msg);
@@ -26,43 +27,42 @@ int getWord(char **buffer)
 
 
 	/* Skip preceding white spaces */
-	while((c = getchar()) != EOF && ( c == ' ' || c == '\t'))
+	while ((c = getchar()) != EOF && (c == ' ' || c == '\t'))
 		;
 
-	if(c == '\n'){
-		return BN;	
-	}
+	if (c == '\n')
+		return BN;
 
-	if(c == '|'){
+	if (c == '|')
 		return PIPE;
-	}
 
 
 	start = malloc(sizeof(char) * buffSize);
 
-        if(!start){
-                printError("");
+	if (!start) {
+		printError("");
 		return ERROR;
-        }
+	}
 
 	buff = (char *)start;
 
 	*(buff++) = c;
 
-	while((c = getchar()) != EOF && c != '\n' && c != ' ' && c != '|'){
-		if((length = buff - start) >= buffSize - 2){
+	while ((c = getchar()) != EOF && c != '\n' && c != ' ' && c != '|') {
+		length = buff - start;
+		if (length >= buffSize - 2) {
 			buffSize *= 2;
 			start = (char *)realloc(start, buffSize);
 
 			/* Fix identation */
-			if(start == NULL){
+			if (start == NULL) {
 				printError("");
 				return ERROR;
 			}
 
 			buff = start + length;
 		}
-		
+
 		*(buff++) = c;
 	}
 
@@ -71,36 +71,33 @@ int getWord(char **buffer)
 
 	*buffer = start;
 
-	if(c == '\n'){
-                return BN;
-        }
+	if (c == '\n')
+		return BN;
 
 
-	if(c == '|'){
+	if (c == '|')
 		return PIPE;
-	}
 
 	return SPACE;
 }
 
 int main(int argc, char **argv)
 {
-	char * word = NULL;
+	char *word = NULL;
 	int flag;
 
-	while((flag = getWord(&word)) != BN || word != NULL){
-		if(word != NULL){
-                        printf("%s\n", word);
-                        free(word);
-                        word = NULL;
-                }
+	while ((flag = getWord(&word)) != BN || word != NULL) {
+		if (word != NULL) {
+			printf("%s\n", word);
+			free(word);
+			word = NULL;
+		}
 
-		if(flag == BN)
+		if (flag == BN)
 			break;
 
-		if(flag == PIPE){
+		if (flag == PIPE)
 			printf("Pipe\n");
-		}
 
 	}
 
