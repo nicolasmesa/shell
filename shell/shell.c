@@ -276,7 +276,7 @@ void deletePath(char *pathText)
 
 		free(node);
 	} else {
-		printf("error: Entry \"%s\" not found in path", pathText);
+		printf("error: Entry \"%s\" not found in path\n", pathText);
 	}
 }
 

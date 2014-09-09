@@ -1,0 +1,58 @@
+1.8
+I would design this system by virtualizing the hardware making the OS that is running in top of this system that it is talking directly to the hardware. If the operating system, or any of its running applications need something from the host operating system, the system would make the appropriate system call making the guest operating system that it is in control of the hardware.
+
+1.13
+I'm running Mac OSX.
+
+I think that adoption is a good place to start. Many applications exist only in the Windows world, specially applications used for Businesses. I've heard of many people who would love to get a Mac and get rid of their Windows machine but can't because they need an application that doesn't run on OSX. A Virtual Machine can help them for these type of applications but for other types of software such as graphics intensive games, a virtual machine is not a problem solver.
+
+Security is a very important issue that should be addressed daily, especially if there is a known security hole. Since I haven't heard of a lot of security problems with OSX, this is why this is not the first priority.
+
+Reliability is very important but I think of my system as a reliable system. Nevertheless, the OS designeris should never let the system go out with a serious bug.
+
+Performance: I think that my system has a good performance. Some applications, such as Flash or playing some videos make the computer very hot and drain the battery. I'm not sure if this is the OS's fault or the application's fault. 
+
+Portability: This is not a very big issue for Apple since they decide what hardware goes into their computers, portability is not as big an issue as it is for Linux or Windows that can run in any harware.
+
+3.1
+Yes it can return an error. If, for instance, there are not enough system resources (memory for example) to create a new process, fork has to return an error because the child couldn't be created.
+
+3.2
+Yes it can return an error. If the path to the program to be executed is incorrect, or the program doesn't exist, or the user doesn't have the appropriate privileges to execute the program, the exec function has to fail. When it does, it has to return an error flag (-1).
+
+3.3
+It will call fork creating another process. Now these two processes will also call fork creating 2 more processes. Every process will keep calling fork until fork returns an error. When fork returns an error, that process will stop calling fork and will exit, but the other ones will keep calling fork until the fork function fails in every process.
+
+3.4
+For wait to return successfully and immediately, wait must be called after a child process has changed state (has terminated, has been stopped by a signal or resumed by a signal (according to the wait man page)). 
+
+3.7
+If a call to "exec ls" is made in a UNIX shell, the ls command is run and the output of the ls command is shown. After that control is not given back to shell. This happens because the process that was running the sell program was overlaid with the ls program and when ls finished, so did the process.
+
+3.8
+32 counting the main parent process.
+
+3.9
+After fork is called for the first time, x is declared in both the parent and the child with the value 5. 
+After that 5 is added to the x of the child making it equal to 10. 
+The parent then calls fork making another copy of its x = 5, and then both the new child and the parent add 10 to thos x making them equal to 15.
+Finally, the parent adds 5 to its copy of x making it equal to 20.
+
+At the end there are 3 copies of x. One for the parent, one for the first child and one for the second child.
+
+The value of the parent's copy of x = 20
+The value of the first child's copy of x = 10
+The value of the second child's copy of x = 15
+
+3.10
+The output of the first program would be:
+6
+6
+
+The first 6 would belong to the child process and the second to the parent.
+
+
+In program 2, the following output would be seen
+6
+
+This 6 belongs to the parent since the child exits before increment of the val.
