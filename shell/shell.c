@@ -32,7 +32,7 @@ void printError(char *msg)
 	if (strcmp(msg, "") == 0)
 		msg = strerror(errno);
 
-	printf("error: %s\n", msg);
+	fprintf(stderr,"error: %s\n", msg);
 }
 
 int getWord(char **buffer)
@@ -302,9 +302,11 @@ void handlePathCommand(struct command *command)
 	}
 }
 
-void execCommand(struct command *command)
+void execCommand(struct command *command, int *pipeBeforeFd)
 {
-	int status;
+	//int status;
+	int fd[2];
+	printf("Excec command %s\n", command->command);
 
 	if (strcmp("cd", command->command) == 0 && command->numArgs > 1) {
 		if (chdir(command->args[1]) == -1)
@@ -321,7 +323,12 @@ void execCommand(struct command *command)
 		return;
 	}
 
+	if (command->pipeCommand != NULL) {
+		printf("Creating pipes\n");
+		pipe(fd);
+	}
 
+	printf("Before fork\n");
 	int pid = fork();
 
 	if (pid < 0) {
@@ -330,11 +337,37 @@ void execCommand(struct command *command)
 	}
 
 	if (pid == 0){
+		/* Check dup */
+		printf("Before dup\n");
+		if (command->pipeCommand != NULL) {
+			close(fd[0]);
+			dup2(fd[1], 1);
+			close(fd[1]);
+		}
+
+		if (pipeBeforeFd != NULL) {
+			close(pipeBeforeFd[1]);
+			dup2(pipeBeforeFd[0], 0);
+			close(pipeBeforeFd[0]);
+		}
+
+		printError("Terminados los dup\n");
+
 		execv(command->path, command->args);
 		printError("");
 		exit(errno);
 	}else{
-		wait(&status);		
+		printf("before command check\n");
+		if(pipeBeforeFd != NULL){
+			close(pipeBeforeFd[0]);
+			close(pipeBeforeFd[1]);
+		}
+		if (command->pipeCommand != NULL) {
+			printf("Executing next command\n");
+			execCommand(command->pipeCommand, fd);
+			//close(fd[0]);
+			//close(fd[1]);
+		}
 	}
 		
 	
@@ -355,8 +388,7 @@ void freeCommand(struct command *command)
 int main(int argc, char **argv)
 {
 	struct command *command;
-	int flag;
-
+	int flag, status, pid;
 	printf("$");
 	command = NULL;
 	path = NULL;
@@ -367,7 +399,13 @@ int main(int argc, char **argv)
 			continue;
 		}
 
-		execCommand(command);
+		execCommand(command, NULL);
+		
+
+		printf("getpid: %d\n", getpid());
+
+		while((pid = wait(&status)) != -1)
+			printf("Wait returned with status: %d, pid %d", status, pid);
 
 		printf("$");
 
