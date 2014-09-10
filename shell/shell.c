@@ -340,6 +340,74 @@ void handlePathCommand(struct command *command)
 	}
 }
 
+void handleNewPipeFd(int *fd)
+{
+	int returnVal;
+
+	returnVal = close(fd[0]);
+
+	if (returnVal == -1) {
+		printError("");
+		exit(errno);
+	}
+
+	returnVal = dup2(fd[1], 1);
+
+	if (returnVal == -1) {
+		printError("");
+		exit(errno);
+        }
+
+	returnVal = close(fd[1]);
+
+	if (returnVal == -1) {
+		printError("");
+		exit(errno);
+	}
+}
+
+void handleOldPipeFd(int *fd)
+{
+	int returnVal;
+
+	returnVal = close(fd[1]);
+
+	if (returnVal == -1) {
+		printError("");
+		exit(errno);
+	}
+
+	returnVal = dup2(fd[0], 0);
+
+	if (returnVal == -1) {
+		printError("");
+		exit(errno);
+	}
+
+	returnVal = close(fd[0]);
+
+	if (returnVal == -1) {
+		printError("");
+		exit(errno);
+	}
+}
+
+void closePipeDescriptors(int * fd)
+{
+	int returnVal;
+
+	returnVal = close(fd[0]);
+
+	if (returnVal == -1)
+		printError("");
+	
+
+	returnVal = close(fd[1]);
+
+	if (returnVal == -1)
+		printError("");
+}
+
 void execCommand(struct command *command, int *pipeBeforeFd)
 {
 	int fd[2], pipeReturn = 0;
@@ -376,27 +444,20 @@ void execCommand(struct command *command, int *pipeBeforeFd)
 	}
 
 	if (pid == 0) {
-		/* Check dup */
 		if (command->pipeCommand != NULL) {
-			close(fd[0]);
-			dup2(fd[1], 1);
-			close(fd[1]);
+			handleNewPipeFd(fd);
 		}
 
 		if (pipeBeforeFd != NULL) {
-			close(pipeBeforeFd[1]);
-			dup2(pipeBeforeFd[0], 0);
-			close(pipeBeforeFd[0]);
+			handleOldPipeFd(pipeBeforeFd);	
 		}
-
 
 		execv(command->path, command->args);
 		printError("");
 		exit(errno);
 	} else {
 		if (pipeBeforeFd != NULL) {
-			close(pipeBeforeFd[0]);
-			close(pipeBeforeFd[1]);
+			closePipeDescriptors(pipeBeforeFd);	
 		}
 
 		if (command->pipeCommand != NULL)
