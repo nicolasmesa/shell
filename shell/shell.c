@@ -32,7 +32,7 @@ void printError(char *msg)
 	if (strcmp(msg, "") == 0)
 		msg = strerror(errno);
 
-	fprintf(stderr,"error: %s\n", msg);
+	fprintf(stderr, "error: %s\n", msg);
 }
 
 int getWord(char **buffer)
@@ -100,17 +100,18 @@ int getWord(char **buffer)
 
 void addPathToCommand(struct command *command)
 {
-	if ( *(command->command) == '/') {
+	if (*(command->command) == '/') {
 		command->path = strdup(command->command);
 		return;
 	}
 
 	struct pathNode *node;
 	char *route;
-	int found = 0, acc;
+	int found = 0, acc, totalLength;
 
 	for (node = path; node; node = node->next) {
-		route = malloc(sizeof(char) * (strlen(command->command) + strlen(node->pathText) + 2));
+		totalLength = strlen(command->command) + strlen(node->pathText);
+		route = malloc(sizeof(char) * (totalLength + 2));
 
 		if (route == NULL) {
 			printError("");
@@ -133,12 +134,11 @@ void addPathToCommand(struct command *command)
 	}
 
 
-	if (found == 0) 
-		command-> path = strdup(command->command);
+	if (found == 0)
+		command->path = strdup(command->command);
 
 	if (command->path == NULL)
-		printError("error: Problem in the strdup command to add the path\n");
-	
+		printError("error: Problem in the strduph\n");
 }
 
 
@@ -181,7 +181,7 @@ int getCommand(struct command **commandPtr)
 		command->args[command->numArgs] = NULL;
 		return getCommand(&(command->pipeCommand));
 	}
-	
+
 	word = NULL;
 	while ((flag = getWord(&word)) != BN || word != NULL) {
 		if (flag == ERROR)
@@ -215,7 +215,7 @@ int getCommand(struct command **commandPtr)
 	return 0;
 }
 
-void printPath()
+void printPath(void)
 {
 	struct pathNode *node;
 
@@ -232,14 +232,13 @@ void addPath(char *pathText)
 	if (path == NULL) {
 		path = malloc(sizeof(struct pathNode));
 		node = path;
-	}else{
+	} else {
 		for (node = path; node->next; node = node->next)
 			;
 
 		node->next = malloc(sizeof(struct pathNode));
 		node = node->next;
 	}
-		
 
 	if (node == NULL) {
 		printError("");
@@ -258,8 +257,8 @@ void deletePath(char *pathText)
 	struct pathNode *node, *previous = NULL;
 	int found = 0;
 
-	for (node = path; node; node = node->next){
-		if (strcmp(node->pathText, pathText) == 0){
+	for (node = path; node; node = node->next) {
+		if (strcmp(node->pathText, pathText) == 0) {
 			found = 1;
 			break;
 		}
@@ -268,11 +267,10 @@ void deletePath(char *pathText)
 	}
 
 	if (found == 1) {
-		if (previous == NULL) {
+		if (previous == NULL)
 			path = node->next;
-		} else {
+		else
 			previous->next = node->next;
-		}
 
 		free(node);
 	} else {
@@ -282,12 +280,12 @@ void deletePath(char *pathText)
 
 void handlePathCommand(struct command *command)
 {
-	if (command->numArgs == 1){
+	if (command->numArgs == 1) {
 		printPath();
 		return;
 	}
 
-	if (strcmp("+", command->args[1]) == 0){
+	if (strcmp("+", command->args[1]) == 0) {
 		if (command->numArgs > 2)
 			addPath(command->args[2]);
 		else
@@ -310,20 +308,20 @@ void execCommand(struct command *command, int *pipeBeforeFd)
 		if (chdir(command->args[1]) == -1)
 			printError("");
 
-		return;	
+		return;
 	}
 
 	if (strcmp("exit", command->command) == 0)
 		exit(0);
 
-	if (strcmp("path", command->command) == 0){
+	if (strcmp("path", command->command) == 0) {
 		handlePathCommand(command);
 		return;
 	}
 
-	if (command->pipeCommand != NULL) {
+	if (command->pipeCommand != NULL)
 		pipe(fd);
-	}
+
 
 	int pid = fork();
 
@@ -332,7 +330,7 @@ void execCommand(struct command *command, int *pipeBeforeFd)
 		return;
 	}
 
-	if (pid == 0){
+	if (pid == 0) {
 		/* Check dup */
 		if (command->pipeCommand != NULL) {
 			close(fd[0]);
@@ -350,23 +348,22 @@ void execCommand(struct command *command, int *pipeBeforeFd)
 		execv(command->path, command->args);
 		printError("");
 		exit(errno);
-	}else{
-		if(pipeBeforeFd != NULL){
+	} else {
+		if (pipeBeforeFd != NULL) {
 			close(pipeBeforeFd[0]);
 			close(pipeBeforeFd[1]);
 		}
 
-		if (command->pipeCommand != NULL) 
+		if (command->pipeCommand != NULL)
 			execCommand(command->pipeCommand, fd);
 	}
-		
-	
 }
 
 void freeCommand(struct command *command)
 {
 	int i;
-	if(command->pipeCommand != NULL)
+
+	if (command->pipeCommand != NULL)
 		freeCommand(command->pipeCommand);
 
 	for (i = 0; i < command->numArgs; i++)
@@ -379,6 +376,7 @@ int main(int argc, char **argv)
 {
 	struct command *command;
 	int flag, status, pid;
+
 	printf("$");
 	command = NULL;
 	path = NULL;
@@ -390,9 +388,9 @@ int main(int argc, char **argv)
 		}
 
 		execCommand(command, NULL);
-		
+
 		/* Check error */
-		while((pid = wait(&status)) != -1)
+		while ((pid = wait(&status)) != -1)
 			;
 
 		printf("$");
