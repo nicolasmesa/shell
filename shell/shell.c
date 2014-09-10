@@ -304,9 +304,7 @@ void handlePathCommand(struct command *command)
 
 void execCommand(struct command *command, int *pipeBeforeFd)
 {
-	//int status;
 	int fd[2];
-	printf("Excec command %s\n", command->command);
 
 	if (strcmp("cd", command->command) == 0 && command->numArgs > 1) {
 		if (chdir(command->args[1]) == -1)
@@ -324,11 +322,9 @@ void execCommand(struct command *command, int *pipeBeforeFd)
 	}
 
 	if (command->pipeCommand != NULL) {
-		printf("Creating pipes\n");
 		pipe(fd);
 	}
 
-	printf("Before fork\n");
 	int pid = fork();
 
 	if (pid < 0) {
@@ -338,7 +334,6 @@ void execCommand(struct command *command, int *pipeBeforeFd)
 
 	if (pid == 0){
 		/* Check dup */
-		printf("Before dup\n");
 		if (command->pipeCommand != NULL) {
 			close(fd[0]);
 			dup2(fd[1], 1);
@@ -351,23 +346,18 @@ void execCommand(struct command *command, int *pipeBeforeFd)
 			close(pipeBeforeFd[0]);
 		}
 
-		printError("Terminados los dup\n");
 
 		execv(command->path, command->args);
 		printError("");
 		exit(errno);
 	}else{
-		printf("before command check\n");
 		if(pipeBeforeFd != NULL){
 			close(pipeBeforeFd[0]);
 			close(pipeBeforeFd[1]);
 		}
-		if (command->pipeCommand != NULL) {
-			printf("Executing next command\n");
+
+		if (command->pipeCommand != NULL) 
 			execCommand(command->pipeCommand, fd);
-			//close(fd[0]);
-			//close(fd[1]);
-		}
 	}
 		
 	
@@ -401,11 +391,9 @@ int main(int argc, char **argv)
 
 		execCommand(command, NULL);
 		
-
-		printf("getpid: %d\n", getpid());
-
+		/* Check error */
 		while((pid = wait(&status)) != -1)
-			printf("Wait returned with status: %d, pid %d", status, pid);
+			;
 
 		printf("$");
 
