@@ -159,8 +159,11 @@ void addPathToCommand(struct command *command)
 
 		if (acc == 0) {
 			command->path = strdup(route);
+			free(route);
 			found = 1;
 			break;
+		} else if (acc == -1 && errno != EACCES && errno != ENOENT){
+			printError("");	
 		}
 
 		free(route);
@@ -239,11 +242,15 @@ int getCommand(struct command **commandPtr)
 
 		word = NULL;
 
-		/* Verify max ars */
+		if(command->numArgs > MAX_ARGS - 1) {
+			commandState = S_ERROR;
+			fprintf(stderr, "Maximum number of arguments (%d) exceeded\n", MAX_ARGS);
+			ignoreRemainingCharacters();
+			break;
+		}
 	}
 
 	command->args[command->numArgs] = NULL;
-
 
 	return 0;
 }
@@ -399,9 +406,6 @@ void freeCommand(struct command *command)
 	if (command == NULL)
 		return;
 
-//	if (command->command != NULL)
-//		free(command->command);
-
 	if (command->pipeCommand != NULL)
 		freeCommand(command->pipeCommand);
 
@@ -446,6 +450,10 @@ int main(int argc, char **argv)
 		/* Check error */
 		while ((pid = wait(&status)) != -1)
 			;
+
+		if (errno != ECHILD)
+			printError("");
+
 
 		printf("$");
 
