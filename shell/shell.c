@@ -342,7 +342,7 @@ void handlePathCommand(struct command *command)
 
 void execCommand(struct command *command, int *pipeBeforeFd)
 {
-	int fd[2];
+	int fd[2], pipeReturn = 0;
 
 	if (strcmp("cd", command->command) == 0 && command->numArgs > 1) {
 		if (chdir(command->args[1]) == -1)
@@ -360,7 +360,12 @@ void execCommand(struct command *command, int *pipeBeforeFd)
 	}
 
 	if (command->pipeCommand != NULL)
-		pipe(fd);
+		pipeReturn = pipe(fd);
+
+	if (pipeReturn == -1){
+		printError("");
+		return;
+	}
 
 
 	int pid = fork();
