@@ -56,7 +56,7 @@ int getWord(char **buffer)
 	char *buff;
 
 
-	/* Skip preceding white spaces */
+	/* Skip preceding white spaces  and tabs*/
 	while ((c = getchar()) != EOF && (c == ' ' || c == '\t'))
 		;
 
@@ -78,8 +78,8 @@ int getWord(char **buffer)
 		if (commandState == S_ERROR)
 			ignoreRemainingCharacters();
 
-		
-		return PIPE;		
+
+		return PIPE;
 	}
 
 
@@ -162,8 +162,8 @@ void addPathToCommand(struct command *command)
 			free(route);
 			found = 1;
 			break;
-		} else if (acc == -1 && errno != EACCES && errno != ENOENT){
-			printError("");	
+		} else if (acc == -1 && errno != EACCES && errno != ENOENT) {
+			printError("");
 		}
 
 		free(route);
@@ -242,9 +242,11 @@ int getCommand(struct command **commandPtr)
 
 		word = NULL;
 
-		if(command->numArgs > MAX_ARGS - 1) {
+		if (command->numArgs > MAX_ARGS - 1) {
 			commandState = S_ERROR;
-			fprintf(stderr, "Maximum number of arguments (%d) exceeded\n", MAX_ARGS);
+			fprintf(stderr, "Can't have more than %d arguments\n",
+				 MAX_ARGS);
+
 			ignoreRemainingCharacters();
 			break;
 		}
@@ -356,7 +358,7 @@ void handleNewPipeFd(int *fd)
 	if (returnVal == -1) {
 		printError("");
 		exit(errno);
-        }
+	}
 
 	returnVal = close(fd[1]);
 
@@ -392,7 +394,7 @@ void handleOldPipeFd(int *fd)
 	}
 }
 
-void closePipeDescriptors(int * fd)
+void closePipeDescriptors(int *fd)
 {
 	int returnVal;
 
@@ -400,7 +402,7 @@ void closePipeDescriptors(int * fd)
 
 	if (returnVal == -1)
 		printError("");
-	
+
 
 	returnVal = close(fd[1]);
 
@@ -430,7 +432,7 @@ void execCommand(struct command *command, int *pipeBeforeFd)
 	if (command->pipeCommand != NULL)
 		pipeReturn = pipe(fd);
 
-	if (pipeReturn == -1){
+	if (pipeReturn == -1) {
 		printError("");
 		return;
 	}
@@ -444,21 +446,18 @@ void execCommand(struct command *command, int *pipeBeforeFd)
 	}
 
 	if (pid == 0) {
-		if (command->pipeCommand != NULL) {
+		if (command->pipeCommand != NULL)
 			handleNewPipeFd(fd);
-		}
 
-		if (pipeBeforeFd != NULL) {
-			handleOldPipeFd(pipeBeforeFd);	
-		}
+		if (pipeBeforeFd != NULL)
+			handleOldPipeFd(pipeBeforeFd);
 
 		execv(command->path, command->args);
 		printError("");
 		exit(errno);
 	} else {
-		if (pipeBeforeFd != NULL) {
-			closePipeDescriptors(pipeBeforeFd);	
-		}
+		if (pipeBeforeFd != NULL)
+			closePipeDescriptors(pipeBeforeFd);
 
 		if (command->pipeCommand != NULL)
 			execCommand(command->pipeCommand, fd);
