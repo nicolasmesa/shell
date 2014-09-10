@@ -14,6 +14,13 @@
 
 #define MAX_ARGS 20
 
+#define S_FIRST 1
+#define S_PIPE 2
+#define S_COMMAND 3
+#define S_ERROR 4
+
+int commandState;
+
 struct command {
 	char *command;
 	char *args[MAX_ARGS + 1];
@@ -35,6 +42,12 @@ void printError(char *msg)
 	fprintf(stderr, "error: %s\n", msg);
 }
 
+void ignoreRemainingCharacters(void)
+{
+	while (getchar() != '\n')
+		;
+}
+
 int getWord(char **buffer)
 {
 	char c;
@@ -50,8 +63,24 @@ int getWord(char **buffer)
 	if (c == '\n')
 		return BN;
 
-	if (c == '|')
-		return PIPE;
+	if (c == '|') {
+		if (commandState == S_PIPE) {
+			printError("Can't have two pipes in a row");
+			commandState = S_ERROR;
+			printError("YE");
+		} else if (commandState == S_FIRST) {
+			printError("Unexpected \"|\"");
+			commandState = S_ERROR;
+		} else {
+			commandState = PIPE;
+		}
+
+		if (commandState == S_ERROR)
+			ignoreRemainingCharacters();
+
+		
+		return PIPE;		
+	}
 
 
 	start = malloc(sizeof(char) * buffSize);
@@ -64,6 +93,8 @@ int getWord(char **buffer)
 	buff = (char *)start;
 
 	*(buff++) = c;
+
+	commandState = S_COMMAND;
 
 	while ((c = getchar()) != EOF && c != '\n' && c != ' ' && c != '|') {
 		length = buff - start;
@@ -92,8 +123,10 @@ int getWord(char **buffer)
 		return BN;
 
 
-	if (c == '|')
+	if (c == '|') {
+		commandState = S_PIPE;
 		return PIPE;
+	}
 
 	return SPACE;
 }
@@ -363,6 +396,12 @@ void freeCommand(struct command *command)
 {
 	int i;
 
+	if (command == NULL)
+		return;
+
+//	if (command->command != NULL)
+//		free(command->command);
+
 	if (command->pipeCommand != NULL)
 		freeCommand(command->pipeCommand);
 
@@ -380,10 +419,25 @@ int main(int argc, char **argv)
 	printf("$");
 	command = NULL;
 	path = NULL;
+	commandState = S_FIRST;
 
 	while ((flag = getCommand(&command)) != -1) {
+		if (commandState == S_PIPE) {
+			printError("Can't end command with a pipe");
+			commandState = S_ERROR;
+		}
+
+		if (commandState == S_ERROR) {
+			freeCommand(command);
+			command = NULL;
+			printf("$");
+			commandState = S_FIRST;
+			continue;
+		}
+
 		if (command == NULL) {
 			printf("$");
+			commandState = S_FIRST;
 			continue;
 		}
 
@@ -397,6 +451,7 @@ int main(int argc, char **argv)
 
 		freeCommand(command);
 		command = NULL;
+		commandState = S_FIRST;
 	}
 
 	return 0;
