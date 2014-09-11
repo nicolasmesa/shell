@@ -1,0 +1,106 @@
+Script started on Wed Sep 10 20:01:38 2014
+$ls /etc
+error: No such file or directory
+$/bin/ls /etc
+X11			cron.d			fstab	     initramfs-tools  libnl-3	      mtab		       protocols    rsyslog.conf  sudoers.d
+adduser.conf		cron.daily		fstab.d      inputrc	      locale.alias    nanorc		       python	    rsyslog.d	  sysctl.conf
+alternatives		cron.hourly		fuse.conf    insserv	      localtime       network		       python2.7    securetty	  sysctl.d
+apm			cron.monthly		gai.conf     insserv.conf     logcheck	      networks		       python3	    security	  systemd
+apparmor		cron.weekly		groff	     insserv.conf.d   login.defs      newt		       python3.4    selinux	  terminfo
+apparmor.d		crontab			group	     iproute2	      logrotate.conf  nsswitch.conf	       rc.local     services	  timezone
+apt			dbus-1			group-	     iscsi	      logrotate.d     opt		       rc0.d	    sgml	  ucf.conf
+bash.bashrc		debconf.conf		grub.d	     issue	      lsb-release     os-release	       rc1.d	    shadow	  udev
+bash_completion		debian_version		gshadow      issue.net	      ltrace.conf     pam.conf		       rc2.d	    shadow-	  ufw
+bash_completion.d	default			gshadow-     kbd	      magic	      pam.d		       rc3.d	    shells	  update-manager
+bindresvport.blacklist	deluser.conf		hdparm.conf  kernel	      magic.mime      passwd		       rc4.d	    skel	  update-motd.d
+blkid.conf		depmod.d		host.conf    kernel-img.conf  mailcap	      passwd-		       rc5.d	    ssh		  updatedb.conf
+blkid.tab		dhcp			hostname     ld.so.cache      mailcap.order   perl		       rc6.d	    ssl		  upstart-xsessions
+ca-certificates		discover-modprobe.conf	hosts	     ld.so.conf       manpath.config  pm		       rcS.d	    subgid	  vim
+ca-certificates.conf	discover.conf.d		hosts.allow  ld.so.conf.d     mime.types      popularity-contest.conf  resolv.conf  subgid-	  vtrgb
+calendar		dpkg			hosts.deny   ldap	      mke2fs.conf     ppp		       resolvconf   subuid	  wgetrc
+chatscripts		environment		init	     legal	      modprobe.d      profile		       rmt	    subuid-	  xml
+console-setup		fonts			init.d	     libaudit.conf    modules	      profile.d		       rpc	    sudoers	  zsh_command_not_found
+$path
+
+$path + /bin
+$path
+/bin
+$ls /etc
+X11			cron.d			fstab	     initramfs-tools  libnl-3	      mtab		       protocols    rsyslog.conf  sudoers.d
+adduser.conf		cron.daily		fstab.d      inputrc	      locale.alias    nanorc		       python	    rsyslog.d	  sysctl.conf
+alternatives		cron.hourly		fuse.conf    insserv	      localtime       network		       python2.7    securetty	  sysctl.d
+apm			cron.monthly		gai.conf     insserv.conf     logcheck	      networks		       python3	    security	  systemd
+apparmor		cron.weekly		groff	     insserv.conf.d   login.defs      newt		       python3.4    selinux	  terminfo
+apparmor.d		crontab			group	     iproute2	      logrotate.conf  nsswitch.conf	       rc.local     services	  timezone
+apt			dbus-1			group-	     iscsi	      logrotate.d     opt		       rc0.d	    sgml	  ucf.conf
+bash.bashrc		debconf.conf		grub.d	     issue	      lsb-release     os-release	       rc1.d	    shadow	  udev
+bash_completion		debian_version		gshadow      issue.net	      ltrace.conf     pam.conf		       rc2.d	    shadow-	  ufw
+bash_completion.d	default			gshadow-     kbd	      magic	      pam.d		       rc3.d	    shells	  update-manager
+bindresvport.blacklist	deluser.conf		hdparm.conf  kernel	      magic.mime      passwd		       rc4.d	    skel	  update-motd.d
+blkid.conf		depmod.d		host.conf    kernel-img.conf  mailcap	      passwd-		       rc5.d	    ssh		  updatedb.conf
+blkid.tab		dhcp			hostname     ld.so.cache      mailcap.order   perl		       rc6.d	    ssl		  upstart-xsessions
+ca-certificates		discover-modprobe.conf	hosts	     ld.so.conf       manpath.config  pm		       rcS.d	    subgid	  vim
+ca-certificates.conf	discover.conf.d		hosts.allow  ld.so.conf.d     mime.types      popularity-contest.conf  resolv.conf  subgid-	  vtrgb
+calendar		dpkg			hosts.deny   ldap	      mke2fs.conf     ppp		       resolvconf   subuid	  wgetrc
+chatscripts		environment		init	     legal	      modprobe.d      profile		       rmt	    subuid-	  xml
+console-setup		fonts			init.d	     libaudit.conf    modules	      profile.d		       rpc	    sudoers	  zsh_command_not_found
+$path + /usr/bin
+$path
+/bin:/usr/bin
+$path + /sbin
+$path
+/bin:/usr/bin:/sbin
+$path - /sbin
+$path
+/bin:/usr/bin
+$pwd
+/home/w4118/Course/hmwk1/shell
+$cd ..
+$pwd
+/home/w4118/Course/hmwk1
+$ls -al /etc | grep .conf
+-rw-r--r--  1 root root    2981 Sep  4 16:52 adduser.conf
+-rw-r--r--  1 root root     321 Apr 16 12:07 blkid.conf
+-rw-r--r--  1 root root    7464 Sep  4 16:55 ca-certificates.conf
+-rw-r--r--  1 root root    2969 Feb 23  2014 debconf.conf
+-rw-r--r--  1 root root     604 Nov  7  2013 deluser.conf
+-rw-r--r--  1 root root     346 Dec 29  2013 discover-modprobe.conf
+drwxr-xr-x  2 root root    4096 Sep  4 16:55 discover.conf.d
+-rw-r-----  1 root fuse     280 May 24  2013 fuse.conf
+-rw-r--r--  1 root root    2584 Oct 10  2012 gai.conf
+-rw-r--r--  1 root root    4781 Nov 15  2013 hdparm.conf
+-rw-r--r--  1 root root      92 Feb 19  2014 host.conf
+-rw-r--r--  1 root root     771 May 18  2013 insserv.conf
+drwxr-xr-x  2 root root    4096 May 18  2013 insserv.conf.d
+-rw-r--r--  1 root root     144 Sep  4 16:58 kernel-img.conf
+-rw-r--r--  1 root root      34 Sep  4 16:52 ld.so.conf
+drwxr-xr-x  2 root root    4096 Sep  4 16:59 ld.so.conf.d
+-rw-r--r--  1 root root     191 Dec  4  2013 libaudit.conf
+-rw-r--r--  1 root root     703 Jan 22  2014 logrotate.conf
+-rw-r--r--  1 root root   14867 May  9 19:50 ltrace.conf
+-rw-r--r--  1 root root    5173 Apr 10 06:59 manpath.config
+-rw-r--r--  1 root root     956 Feb 19  2014 mke2fs.conf
+-rw-r--r--  1 root root     475 Feb 19  2014 nsswitch.conf
+-rw-r--r--  1 root root     552 Jan 31  2014 pam.conf
+-rw-r--r--  1 root root     350 Sep  4 16:55 popularity-contest.conf
+lrwxrwxrwx  1 root root      29 Sep  4 16:53 resolv.conf -> ../run/resolvconf/resolv.conf
+drwxr-xr-x  4 root root    4096 Sep  4 16:55 resolvconf
+-rw-r--r--  1 root root    1320 Aug 19 15:51 rsyslog.conf
+-rw-r--r--  1 root root    2084 Mar 31  2013 sysctl.conf
+-rw-r--r--  1 root root    1260 Jun 30  2013 ucf.conf
+-rw-r--r--  1 root root     321 Jun 20  2013 updatedb.conf
+$ls -al /etc | grep .conf |           wc -l
+30
+$ls -al /etc|grep .conf|wc -l
+30
+$echo Hello this-is-a-ver-long-text-used-to-check-that-my-shell-handles-arguments-of-any-length-and-has-no-problem-with them aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa end
+Hello this-is-a-ver-long-text-used-to-check-that-my-shell-handles-arguments-of-any-length-and-has-no-problem-with them aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa end
+$|ls
+error: Unexpected "|"
+$ls|
+error: Can't end command with a pipe
+$ls -al /etc || grep .conf
+error: Can't have two pipes in a row
+$exit
+
+Script done on Wed Sep 10 20:03:51 2014

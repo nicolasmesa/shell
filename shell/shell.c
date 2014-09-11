@@ -67,7 +67,6 @@ int getWord(char **buffer)
 		if (commandState == S_PIPE) {
 			printError("Can't have two pipes in a row");
 			commandState = S_ERROR;
-			printError("YE");
 		} else if (commandState == S_FIRST) {
 			printError("Unexpected \"|\"");
 			commandState = S_ERROR;
@@ -207,11 +206,12 @@ int getCommand(struct command **commandPtr)
 	addPathToCommand(command);
 
 	command->args[command->numArgs++] = word;
-
 	*commandPtr = command;
 
-	if (flag == BN)
+	if (flag == BN) {
+		command->args[command->numArgs] = NULL;
 		return BN;
+	}
 
 	if (flag == PIPE) {
 		command->args[command->numArgs] = NULL;
