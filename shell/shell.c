@@ -5,30 +5,36 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-/* ERROR: means there an error that will make the
-	the shell exit
-   SPACE: means that there was a space after a word
-   BN: means that there was a \n after a word
-   PIPE: means that there was a pipe after a word */
+/*
+ * ERROR: means there an error that will make the
+ *	the shell exit
+ * SPACE: means that there was a space after a word
+ * BN: means that there was a \n after a word
+ * PIPE: means that there was a pipe after a word
+ */
 #define ERROR -1
 #define SPACE 0
 #define BN 1
 #define PIPE 2
 
-/* Space for this many characters is set aside for
-each word. If this value is reached, realloc is called
-and the value is increased just for that word */
+/*
+ * Space for this many characters is set aside for
+ * each word. If this value is reached, realloc is called
+ * and the value is increased just for that word
+ */
 #define INITIAL_WORD_SIZE 20
 
 /* Maximum number of arguments. Feel free to change it */
 #define MAX_ARGS 20
 
-/* S_FIRTS: means that the current command is the first one
-	(no pipes before it)
-   S_PIPE: Means that there is a pipe before the next command
-   S_COMMAND: Means that a command is being parsed
-   S_ERROR: means an error was found (for expmple two consecutive pipes
-	with no command in between them*/
+/*
+ * S_FIRTS: means that the current command is the first one
+ *	(no pipes before it)
+ *  S_PIPE: Means that there is a pipe before the next command
+ * S_COMMAND: Means that a command is being parsed
+ * S_ERROR: means an error was found (for expmple two consecutive pipes
+ *	with no command in between them
+ */
 #define S_FIRST 1
 #define S_PIPE 2
 #define S_COMMAND 3
@@ -71,7 +77,7 @@ int getWord(char **buffer)
 	char *buff;
 
 
-	/* Skip preceding white spaces  and tabs*/
+	/* Skip preceding white spaces  and tabs */
 	while ((c = getchar()) != EOF && (c == ' ' || c == '\t'))
 		;
 
@@ -112,10 +118,12 @@ int getWord(char **buffer)
 
 	while ((c = getchar()) != EOF && c != '\n' && c != ' ' && c != '|') {
 		length = buff - start;
-		/* check if length of the word (so far) is greater than
-		the allocated buffer -2 (missing the \0 at the end. If
-		it is reallocate the buffer multiplying its length times
-		two*/
+		/*
+		 * check if length of the word (so far) is greater than
+		 * the allocated buffer -2 (missing the \0 at the end. If
+		 * it is reallocate the buffer multiplying its length times
+		 * two
+		 */
 		if (length >= buffSize - 2) {
 			buffSize *= 2;
 			start = (char *)realloc(start, buffSize);
@@ -170,9 +178,11 @@ void addPathToCommand(struct command *command)
 			break;
 		}
 
-		/* Concatenate the path with a / and the command. There
-		could be a // if the path is ended with a / but execv
-		still works with this problem (/bin//ls) */
+		/*
+		 *Concatenate the path with a / and the command. There
+		 * could be a // if the path is ended with a / but execv
+		 *still works with this problem (/bin//ls)
+		 */
 		sprintf(route, "%s/%s", node->pathText, command->command);
 
 		/* Check if the program exists and is executable by the user */
@@ -190,8 +200,10 @@ void addPathToCommand(struct command *command)
 		free(route);
 	}
 
-	/* If it was not found, let execv try in the CWD and if it still
-	doesn't find it, let execv handle the error */
+	/*
+	 * If it was not found, let execv try in the CWD and if it still
+	 * doesn't find it, let execv handle the error
+	 */
 	if (found == 0)
 		command->path = strdup(command->command);
 
@@ -199,8 +211,10 @@ void addPathToCommand(struct command *command)
 		printError("error: Problem in the strdup\n");
 }
 
-/* Fills the command structure with the
-appropriate data*/
+/*
+ * Fills the command structure with the
+ * appropriate data
+ */
 int getCommand(struct command **commandPtr)
 {
 	char *word;
@@ -232,8 +246,10 @@ int getCommand(struct command **commandPtr)
 	command->args[command->numArgs++] = word;
 	*commandPtr = command;
 
-	/* If \n is found, the NULL is appended to numArgs to let execv
-	know that no more arguments are present */
+	/*
+	 *If \n is found, the NULL is appended to numArgs to let execv
+	 * know that no more arguments are present
+	 */
 	if (flag == BN) {
 		command->args[command->numArgs] = NULL;
 		return BN;
@@ -245,8 +261,10 @@ int getCommand(struct command **commandPtr)
 	}
 
 	word = NULL;
-	/* Iterate through each word and add it to the args
-	array */
+	/*
+	 * Iterate through each word and add it to the args
+	 * array
+	 */
 	while ((flag = getWord(&word)) != BN || word != NULL) {
 		if (flag == ERROR)
 			continue;
@@ -373,9 +391,11 @@ void handlePathCommand(struct command *command)
 	}
 }
 
-/* Closes unnecessary file descriptors and duplicates the write portion
-of the pipe to STDOUT. This function handles the piping for the command
-that is at the left side of the pipe */
+/*
+ * Closes unnecessary file descriptors and duplicates the write portion
+ * of the pipe to STDOUT. This function handles the piping for the command
+ * that is at the left side of the pipe
+ */
 void handleNewPipeFd(int *fd)
 {
 	int returnVal;
@@ -402,9 +422,11 @@ void handleNewPipeFd(int *fd)
 	}
 }
 
-/* Closes unnecessary file descriptors and duplicates the read portion
-of the pipe to STDIN. This function handles the piping for the command
-that is at the right side of the pipe */
+/*
+ *Closes unnecessary file descriptors and duplicates the read portion
+ *of the pipe to STDIN. This function handles the piping for the command
+ *that is at the right side of the pipe
+ */
 void handleOldPipeFd(int *fd)
 {
 	int returnVal;
@@ -448,8 +470,10 @@ void closePipeDescriptors(int *fd)
 		printError("");
 }
 
-/* Verifies if the command should be executed by the shell (cd, path, exit)
-and executes them. If not, it forks and executes the command(s) */
+/*
+ * Verifies if the command should be executed by the shell (cd, path, exit)
+ * and executes them. If not, it forks and executes the command(s)
+ */
 void execCommand(struct command *command, int *pipeBeforeFd)
 {
 	int fd[2], pipeReturn = 0;
@@ -486,15 +510,19 @@ void execCommand(struct command *command, int *pipeBeforeFd)
 	}
 
 	if (pid == 0) {
-		/* Check if there is another command piped after this one
-		and if it is handle the ouput of this command to be the
-		input of the other command */
+		/*
+		 * Check if there is another command piped after this one
+		 * and if it is handle the ouput of this command to be the
+		 *input of the other command
+		 */
 		if (command->pipeCommand != NULL)
 			handleNewPipeFd(fd);
 
-		/* If there was a pipe before, handle the input by
-		making it the read part of the pipe instead of
-		STDIN*/
+		/*
+		 * If there was a pipe before, handle the input by
+		 * making it the read part of the pipe instead of
+		 * STDIN
+		 */
 		if (pipeBeforeFd != NULL)
 			handleOldPipeFd(pipeBeforeFd);
 
@@ -536,8 +564,10 @@ int main(int argc, char **argv)
 	command = NULL;
 	path = NULL;
 
-	/* S_FIRST means that it is the first command
-	that will be executed. (No pipes before it) */
+	/*
+	 * S_FIRST means that it is the first command
+	 * that will be executed. (No pipes before it)
+	 */
 	commandState = S_FIRST;
 
 	while ((flag = getCommand(&command)) != -1) {
@@ -546,9 +576,11 @@ int main(int argc, char **argv)
 			commandState = S_ERROR;
 		}
 
-		/* If there was an error, no the command is freed. No
-		error message is shown because it has already been shown
-		by the getCommand function */
+		/*
+		 * If there was an error, no the command is freed. No
+		 * error message is shown because it has already been shown
+		 * by the getCommand function
+		 */
 		if (commandState == S_ERROR) {
 			freeCommand(command);
 			command = NULL;
@@ -557,8 +589,10 @@ int main(int argc, char **argv)
 			continue;
 		}
 
-		/* Handle \n commands. Simply put the prompt again and
-		set the state of the command to S_FIRST*/
+		/*
+		 * Handle \n commands. Simply put the prompt again and
+		 * set the state of the command to S_FIRST
+		 */
 		if (command == NULL) {
 			printf("$");
 			commandState = S_FIRST;
@@ -571,9 +605,11 @@ int main(int argc, char **argv)
 		while ((pid = wait(&status)) != -1)
 			;
 
-		/* Check why the wait function failed and if it was
-		not because there are no more child processes to wait
-		for, an error message is displayed */
+		/*
+		 * Check why the wait function failed and if it was
+		 * not because there are no more child processes to wait
+		 * for, an error message is displayed
+		 */
 		if (errno != ECHILD)
 			printError("");
 
