@@ -54,3 +54,7 @@ Difference with what was assigned
 .gitignore
 1. To avoid submitting binaries, a .gitignore was created. Both the "w4118_sh" and "shell.o" were added.
 2. "checkpathch.pl" was also added to the .gitignore to avoid submitting it 
+
+
+References
+1. http://www.cs.loyola.edu/~jglenn/702/S2005/Examples/dup2.html
