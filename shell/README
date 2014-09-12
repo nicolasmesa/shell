@@ -1,0 +1,56 @@
+Nicolas Mesa
+Homework 1
+
+Assumptions
+1. The "path +" command will receive only one more argument as the path to be added. The rest will be ignored.
+2. The "path +" command will note check if the directory being added exists. It just adds the text as a new list node.
+3. The "path +" command will not check if the path already exists in the list.
+4. The "path -" command will receive only one more argument as the path to be deleted. The rest will be ignored
+5. The "path -" command will check to see if the path exists. If it does, it will be deleted, if it doesn't an error message will be displayed.
+6. In case there are repeated paths in the path list, the first one that was added will be the first one to be deleted when a call to "path -" occurs. Only one will be deleted per call.
+7. The path directory can end in "/" (e.g. "/bin/"). When building the path to check if a program exists the path to the command could en up being "/bin//ls" if a "/" was put at the end of the path text. This is acceptable since the program lookup and execv work even if thos two "/"s are put together.
+8. The "cd" command is expected to receive only one argument. The rest of the arguments will be ignored.
+9. The shell does not check if the directory exists when a call to "cd" is made. Instead, it calls the chdir function and, if it fails, it will show the appropriate error message
+10. The maximum number of arguments was set to 20. This number can be easily changed by changing the value of the constant MAX_ARGS.
+11. The return value of execv is not checked. Instead, if it continues to the next instruction, it is assumed that it failed, and the appropriate error message is displayed.
+
+
+
+Testing
+1. I used the python script that was published ("hw1_sample.py") to check my shell. 24 out of 24 tests passed.
+2. I also did a test run by typing some commands and triggering some corner cases. The result of that test is in the typescript file. The following commands were the ones that were executed (in that order)
+
+ls /etc
+/bin/ls /etc
+path
+path + /bin
+path
+ls /etc
+path + /usr/bin
+path
+path + /sbin
+path
+path - /sbin
+path
+pwd
+cd ..
+pwd
+ls -al /etc | grep .conf
+ls -al /etc | grep .conf |           wc -l
+ls -al /etc|grep .conf|wc -l
+echo Hello this-is-a-ver-long-text-used-to-check-that-my-shell-handles-arguments-of-any-length-and-has-no-problem-with them aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa end
+|ls
+ls|
+ls -al /etc || grep .conf
+exit
+
+3. The code style was checked with "checkpathch.pl" and was modified until it didn't find any more errors or warning
+
+Difference with what was assigned
+1. There are two places where I exceeded 3 levels of indentation (I did 4). I think this is not a problem, since it was just to make sure the return value of "realloc" was not NULL and another one to check a flag. One these if statements is 2 lines long, and the other one 1 line long, so I don't think that a person who reads it is going to be confused.
+
+
+
+.gitignore
+1. To avoid submitting binaries, a .gitignore was created. Both the "w4118_sh" and "shell.o" were added.
+2. "checkpathch.pl" was also added to the .gitignore to avoid submitting it 

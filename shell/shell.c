@@ -120,7 +120,7 @@ int getWord(char **buffer)
 			buffSize *= 2;
 			start = (char *)realloc(start, buffSize);
 
-			/* Fix identation */
+			/* Check realloc error */
 			if (start == NULL) {
 				printError("");
 				return ERROR;

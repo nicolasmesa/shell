@@ -2,4 +2,3 @@ shell/w4118_sh
 shell/shell.o
 shell/checkpathch.pl
 shell/checkpatch2
-/shell/hw1_sample.py
